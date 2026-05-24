@@ -1,24 +1,19 @@
 package com.schedify.schedify_api.interfaces.controller;
 
-import com.schedify.schedify_api.application.dto.AgendamentoDTO;
-import com.schedify.schedify_api.application.dto.CriarAgendamentoRequest;
-import com.schedify.schedify_api.application.dto.mapper.AgendamentoMapper;
 import com.schedify.schedify_api.application.usecase.CriarAgendamentoUseCase;
-import com.schedify.schedify_api.domain.entity.Agendamento;
-import com.schedify.schedify_api.domain.repository.AgendamentoRepository;
+import com.schedify.schedify_api.domain.port.AgendamentoRepositoryPort;
+import com.schedify.schedify_api.domain.port.ProfissionalRepositoryPort;
+import com.schedify.schedify_api.domain.port.ServicoRepositoryPort;
+import com.schedify.schedify_api.domain.port.UsuarioRepositoryPort;
+import com.schedify.schedify_api.interfaces.dto.AgendamentoResponse;
+import com.schedify.schedify_api.interfaces.dto.CriarAgendamentoRequest;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/agendamentos")
@@ -26,39 +21,52 @@ import org.springframework.web.bind.annotation.RestController;
 public class AgendamentoController {
 
     private final CriarAgendamentoUseCase criarAgendamentoUseCase;
-    private final AgendamentoRepository agendamentoRepository;
-    private final AgendamentoMapper agendamentoMapper;
+    private final AgendamentoRepositoryPort agendamentoRepository;
+    private final UsuarioRepositoryPort usuarioRepository;
+    private final ServicoRepositoryPort servicoRepository;
+    private final ProfissionalRepositoryPort profissionalRepository;
 
     public AgendamentoController(CriarAgendamentoUseCase criarAgendamentoUseCase,
-                                  AgendamentoRepository agendamentoRepository,
-                                  AgendamentoMapper agendamentoMapper) {
+                                  AgendamentoRepositoryPort agendamentoRepository,
+                                  UsuarioRepositoryPort usuarioRepository,
+                                  ServicoRepositoryPort servicoRepository,
+                                  ProfissionalRepositoryPort profissionalRepository) {
         this.criarAgendamentoUseCase = criarAgendamentoUseCase;
         this.agendamentoRepository = agendamentoRepository;
-        this.agendamentoMapper = agendamentoMapper;
+        this.usuarioRepository = usuarioRepository;
+        this.servicoRepository = servicoRepository;
+        this.profissionalRepository = profissionalRepository;
     }
 
     @PostMapping
     @Operation(summary = "Criar um novo agendamento")
-    @ApiResponse(responseCode = "201", description = "Agendamento criado com sucesso")
-    @ApiResponse(responseCode = "409", description = "Conflito de horário com agendamento existente")
-    public ResponseEntity<AgendamentoDTO> criar(@RequestBody @Valid CriarAgendamentoRequest request) {
+    public ResponseEntity<AgendamentoResponse> criar(@Valid @RequestBody CriarAgendamentoRequest request) {
         var agendamento = criarAgendamentoUseCase.executar(
-                request.getUsuarioId(),
-                request.getServicoId(),
-                request.getDataHoraInicio());
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(agendamento));
+                request.usuarioId(), request.servicoId(), request.profissionalId(), request.dataHoraInicio());
+        return ResponseEntity.status(HttpStatus.CREATED).body(enriquecerResponse(agendamento));
     }
 
-    @GetMapping("/usuario/{id}")
+    @GetMapping("/usuario/{usuarioId}")
     @Operation(summary = "Listar agendamentos de um usuário")
-    public ResponseEntity<List<AgendamentoDTO>> listarPorUsuario(
-            @PathVariable Long id) {
-        var agendamentos = agendamentoRepository.buscarPorUsuarioId(id);
-        var dtos = agendamentos.stream().map(this::toDTO).toList();
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<List<AgendamentoResponse>> listarPorUsuario(@PathVariable Long usuarioId) {
+        var agendamentos = agendamentoRepository.buscarPorUsuarioId(usuarioId);
+        var response = agendamentos.stream().map(this::enriquecerResponse).toList();
+        return ResponseEntity.ok(response);
     }
 
-    private AgendamentoDTO toDTO(Agendamento agendamento) {
-        return agendamentoMapper.toDTO(agendamento);
+    private AgendamentoResponse enriquecerResponse(com.schedify.schedify_api.domain.model.Agendamento agendamento) {
+        var nomeUsuario = usuarioRepository.buscarPorId(agendamento.getUsuarioId())
+                .map(u -> u.getNome()).orElse(null);
+        var nomeServico = servicoRepository.buscarPorId(agendamento.getServicoId())
+                .map(s -> s.getNome()).orElse(null);
+        var nomeProfissional = profissionalRepository.buscarPorId(agendamento.getProfissionalId())
+                .map(p -> p.getNome()).orElse(null);
+        return new AgendamentoResponse(
+                agendamento.getId(),
+                agendamento.getUsuarioId(), nomeUsuario,
+                agendamento.getServicoId(), nomeServico,
+                agendamento.getProfissionalId(), nomeProfissional,
+                agendamento.getDataHoraInicio(), agendamento.getDataHoraFim());
     }
+
 }

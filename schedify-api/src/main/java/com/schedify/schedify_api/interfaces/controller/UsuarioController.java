@@ -1,19 +1,14 @@
 package com.schedify.schedify_api.interfaces.controller;
 
-import com.schedify.schedify_api.application.dto.CriarUsuarioRequest;
-import com.schedify.schedify_api.application.dto.UsuarioDTO;
-import com.schedify.schedify_api.application.dto.mapper.UsuarioMapper;
 import com.schedify.schedify_api.application.usecase.CriarUsuarioUseCase;
+import com.schedify.schedify_api.interfaces.dto.CriarUsuarioRequest;
+import com.schedify.schedify_api.interfaces.dto.UsuarioResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -21,19 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsuarioController {
 
     private final CriarUsuarioUseCase criarUsuarioUseCase;
-    private final UsuarioMapper usuarioMapper;
 
-    public UsuarioController(CriarUsuarioUseCase criarUsuarioUseCase,
-                              UsuarioMapper usuarioMapper) {
+    public UsuarioController(CriarUsuarioUseCase criarUsuarioUseCase) {
         this.criarUsuarioUseCase = criarUsuarioUseCase;
-        this.usuarioMapper = usuarioMapper;
     }
 
     @PostMapping
     @Operation(summary = "Criar um novo usuário")
-    @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso")
-    public ResponseEntity<UsuarioDTO> criar(@RequestBody @Valid CriarUsuarioRequest request) {
-        var usuario = criarUsuarioUseCase.executar(request.getNome());
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioMapper.toDTO(usuario));
+    public ResponseEntity<UsuarioResponse> criar(@Valid @RequestBody CriarUsuarioRequest request) {
+        var usuario = criarUsuarioUseCase.executar(request.nome());
+        var response = new UsuarioResponse(usuario.getId(), usuario.getNome());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 }

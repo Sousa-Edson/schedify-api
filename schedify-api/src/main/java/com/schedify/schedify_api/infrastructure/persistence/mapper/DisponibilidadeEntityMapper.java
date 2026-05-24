@@ -1,7 +1,7 @@
 package com.schedify.schedify_api.infrastructure.persistence.mapper;
 
-import com.schedify.schedify_api.domain.entity.Disponibilidade;
-import com.schedify.schedify_api.infrastructure.persistence.DisponibilidadeEntity;
+import com.schedify.schedify_api.domain.model.Disponibilidade;
+import com.schedify.schedify_api.infrastructure.persistence.entity.DisponibilidadeEntity;
 import java.time.DayOfWeek;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,4 +22,5 @@ public interface DisponibilidadeEntityMapper {
     default Integer dayOfWeekToInteger(DayOfWeek dayOfWeek) {
         return dayOfWeek == null ? null : dayOfWeek.getValue();
     }
+
 }

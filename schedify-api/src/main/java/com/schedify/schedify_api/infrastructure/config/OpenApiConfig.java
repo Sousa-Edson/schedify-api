@@ -11,15 +11,9 @@ import org.springframework.context.annotation.Configuration;
     info = @Info(
         title = "Schedify - Sistema de Agendamento Inteligente",
         description = "API para gerenciamento de agendamentos inteligentes com detecção de conflitos e geração automática de slots disponíveis.",
-        version = "1.0.0",
-        contact = @Contact(
-            name = "Schedify",
-            email = "contato@schedify.com"
-        ),
-        license = @License(
-            name = "MIT"
-        )
+        version = "2.0.0",
+        contact = @Contact(name = "Schedify", email = "contato@schedify.com"),
+        license = @License(name = "MIT")
     )
 )
-public class OpenApiConfig {
-}
+public class OpenApiConfig {}

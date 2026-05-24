@@ -1,37 +1,38 @@
 package com.schedify.schedify_api.interfaces.controller;
 
-import com.schedify.schedify_api.application.dto.SlotDTO;
-import com.schedify.schedify_api.application.usecase.GerarSlotsDisponiveisUseCase;
+import com.schedify.schedify_api.application.usecase.ListarSlotsDisponiveisUseCase;
+import com.schedify.schedify_api.domain.service.GeracaoSlotsService.Slot;
+import com.schedify.schedify_api.interfaces.dto.SlotResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/slots")
-@Tag(name = "Slots", description = "Consulta de horários disponíveis para agendamento")
+@Tag(name = "Slots", description = "Geração de horários disponíveis")
 public class SlotController {
 
-    private final GerarSlotsDisponiveisUseCase gerarSlotsDisponiveisUseCase;
+    private final ListarSlotsDisponiveisUseCase listarSlotsDisponiveisUseCase;
 
-    public SlotController(GerarSlotsDisponiveisUseCase gerarSlotsDisponiveisUseCase) {
-        this.gerarSlotsDisponiveisUseCase = gerarSlotsDisponiveisUseCase;
+    public SlotController(ListarSlotsDisponiveisUseCase listarSlotsDisponiveisUseCase) {
+        this.listarSlotsDisponiveisUseCase = listarSlotsDisponiveisUseCase;
     }
 
     @GetMapping
-    @Operation(summary = "Listar slots disponíveis para uma data e serviço")
-    public ResponseEntity<List<SlotDTO>> listarSlotsDisponiveis(
-            @Parameter(description = "Data no formato YYYY-MM-DD")
-            @RequestParam("data") LocalDate data,
-            @Parameter(description = "ID do serviço")
-            @RequestParam("servicoId") Long servicoId) {
-        var slots = gerarSlotsDisponiveisUseCase.executar(data, servicoId);
-        return ResponseEntity.ok(slots);
+    @Operation(summary = "Listar slots disponíveis para um serviço e profissional")
+    public ResponseEntity<List<SlotResponse>> listarSlots(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
+            @RequestParam Long servicoId,
+            @RequestParam Long profissionalId) {
+        var slots = listarSlotsDisponiveisUseCase.executar(data, servicoId, profissionalId);
+        var response = slots.stream()
+                .map(s -> new SlotResponse(s.inicio(), s.fim()))
+                .toList();
+        return ResponseEntity.ok(response);
     }
+
 }
