@@ -22,7 +22,7 @@ class GeracaoSlotsServiceTest {
     @BeforeEach
     void setUp() {
         service = new GeracaoSlotsService();
-        servico = new Servico(1L, "Corte", 30);
+        servico = new Servico(1L, "Corte", 30, 0);
         disponibilidades = List.of(
                 new Disponibilidade(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(12, 0), 1L));
     }

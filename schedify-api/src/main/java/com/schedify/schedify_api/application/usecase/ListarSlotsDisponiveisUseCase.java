@@ -1,12 +1,12 @@
 package com.schedify.schedify_api.application.usecase;
 
-import com.schedify.schedify_api.domain.model.Disponibilidade;
 import com.schedify.schedify_api.domain.port.AgendamentoRepositoryPort;
+import com.schedify.schedify_api.domain.port.BloqueioRepositoryPort;
 import com.schedify.schedify_api.domain.port.DisponibilidadeRepositoryPort;
 import com.schedify.schedify_api.domain.port.ProfissionalRepositoryPort;
 import com.schedify.schedify_api.domain.port.ServicoRepositoryPort;
-import com.schedify.schedify_api.domain.service.GeracaoSlotsService;
-import com.schedify.schedify_api.domain.service.GeracaoSlotsService.Slot;
+import com.schedify.schedify_api.domain.service.AgendaService;
+import com.schedify.schedify_api.domain.service.AgendaService.Slot;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -20,7 +20,8 @@ public class ListarSlotsDisponiveisUseCase {
     private final ProfissionalRepositoryPort profissionalRepository;
     private final DisponibilidadeRepositoryPort disponibilidadeRepository;
     private final AgendamentoRepositoryPort agendamentoRepository;
-    private final GeracaoSlotsService geracaoSlotsService;
+    private final BloqueioRepositoryPort bloqueioRepository;
+    private final AgendaService agendaService;
 
     @Value("${schedify.slot.intervalo-minutos:15}")
     private int intervaloMinutos;
@@ -29,12 +30,14 @@ public class ListarSlotsDisponiveisUseCase {
                                           ProfissionalRepositoryPort profissionalRepository,
                                           DisponibilidadeRepositoryPort disponibilidadeRepository,
                                           AgendamentoRepositoryPort agendamentoRepository,
-                                          GeracaoSlotsService geracaoSlotsService) {
+                                          BloqueioRepositoryPort bloqueioRepository,
+                                          AgendaService agendaService) {
         this.servicoRepository = servicoRepository;
         this.profissionalRepository = profissionalRepository;
         this.disponibilidadeRepository = disponibilidadeRepository;
         this.agendamentoRepository = agendamentoRepository;
-        this.geracaoSlotsService = geracaoSlotsService;
+        this.bloqueioRepository = bloqueioRepository;
+        this.agendaService = agendaService;
     }
 
     public List<Slot> executar(LocalDate data, Long servicoId, Long profissionalId) {
@@ -55,8 +58,9 @@ public class ListarSlotsDisponiveisUseCase {
         var inicioDia = data.atStartOfDay();
         var fimDia = data.atTime(LocalTime.MAX);
         var ocupados = agendamentoRepository.buscarPorProfissionalEPeriodo(profissionalId, inicioDia, fimDia);
+        var bloqueios = bloqueioRepository.buscarPorProfissionalEPeriodo(profissionalId, inicioDia, fimDia);
 
-        return geracaoSlotsService.gerarSlots(data, servico, disponibilidades, ocupados, intervaloMinutos);
+        return agendaService.gerarSlots(data, servico, disponibilidades, ocupados, bloqueios, intervaloMinutos);
     }
 
 }

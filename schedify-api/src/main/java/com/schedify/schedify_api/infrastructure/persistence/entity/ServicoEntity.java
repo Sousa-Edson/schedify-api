@@ -18,6 +18,9 @@ public class ServicoEntity {
     @Column(nullable = false)
     private Integer duracaoMinutos;
 
+    @Column(nullable = false)
+    private Integer bufferMinutos;
+
     @ManyToMany
     @JoinTable(
         name = "servico_profissional",
@@ -34,6 +37,8 @@ public class ServicoEntity {
     public void setNome(String nome) { this.nome = nome; }
     public Integer getDuracaoMinutos() { return duracaoMinutos; }
     public void setDuracaoMinutos(Integer duracaoMinutos) { this.duracaoMinutos = duracaoMinutos; }
+    public Integer getBufferMinutos() { return bufferMinutos; }
+    public void setBufferMinutos(Integer bufferMinutos) { this.bufferMinutos = bufferMinutos; }
     public Set<ProfissionalEntity> getProfissionais() { return profissionais; }
     public void setProfissionais(Set<ProfissionalEntity> profissionais) { this.profissionais = profissionais; }
 

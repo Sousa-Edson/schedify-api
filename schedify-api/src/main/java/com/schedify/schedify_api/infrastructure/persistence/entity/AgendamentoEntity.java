@@ -26,6 +26,12 @@ public class AgendamentoEntity {
     @Column(name = "data_hora_fim", nullable = false)
     private LocalDateTime dataHoraFim;
 
+    @Column(nullable = false, length = 20)
+    private String status;
+
+    @Column(name = "motivo_cancelamento", length = 500)
+    private String motivoCancelamento;
+
     public AgendamentoEntity() {}
 
     public Long getId() { return id; }
@@ -40,5 +46,9 @@ public class AgendamentoEntity {
     public void setDataHoraInicio(LocalDateTime dataHoraInicio) { this.dataHoraInicio = dataHoraInicio; }
     public LocalDateTime getDataHoraFim() { return dataHoraFim; }
     public void setDataHoraFim(LocalDateTime dataHoraFim) { this.dataHoraFim = dataHoraFim; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getMotivoCancelamento() { return motivoCancelamento; }
+    public void setMotivoCancelamento(String motivoCancelamento) { this.motivoCancelamento = motivoCancelamento; }
 
 }

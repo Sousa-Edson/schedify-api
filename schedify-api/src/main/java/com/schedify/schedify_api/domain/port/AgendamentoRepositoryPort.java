@@ -10,5 +10,6 @@ public interface AgendamentoRepositoryPort {
     Optional<Agendamento> buscarPorId(Long id);
     List<Agendamento> buscarPorServicoEPeriodo(Long servicoId, LocalDateTime inicio, LocalDateTime fim);
     List<Agendamento> buscarPorProfissionalEPeriodo(Long profissionalId, LocalDateTime inicio, LocalDateTime fim);
+    List<Agendamento> buscarPorProfissionalEPeriodoComLock(Long profissionalId, LocalDateTime inicio, LocalDateTime fim);
     List<Agendamento> buscarPorUsuarioId(Long usuarioId);
 }

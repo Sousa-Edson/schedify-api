@@ -15,6 +15,9 @@ public class ProfissionalEntity {
     @Column(nullable = false, length = 150)
     private String nome;
 
+    @Column(nullable = false)
+    private Boolean ativo;
+
     @ManyToMany(mappedBy = "profissionais")
     private Set<ServicoEntity> servicos = new HashSet<>();
 
@@ -24,6 +27,8 @@ public class ProfissionalEntity {
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public Set<ServicoEntity> getServicos() { return servicos; }
     public void setServicos(Set<ServicoEntity> servicos) { this.servicos = servicos; }
 

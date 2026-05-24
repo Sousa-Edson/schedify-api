@@ -1,15 +1,14 @@
 package com.schedify.schedify_api.application.usecase;
 
 import com.schedify.schedify_api.domain.model.Agendamento;
-import com.schedify.schedify_api.domain.model.Servico;
 import com.schedify.schedify_api.domain.port.AgendamentoRepositoryPort;
+import com.schedify.schedify_api.domain.port.BloqueioRepositoryPort;
 import com.schedify.schedify_api.domain.port.ProfissionalRepositoryPort;
 import com.schedify.schedify_api.domain.port.ServicoRepositoryPort;
 import com.schedify.schedify_api.domain.port.UsuarioRepositoryPort;
-import com.schedify.schedify_api.domain.service.ValidacaoConflitoService;
-import java.time.LocalDate;
+import com.schedify.schedify_api.domain.service.AgendaService;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,18 +19,21 @@ public class CriarAgendamentoUseCase {
     private final ServicoRepositoryPort servicoRepository;
     private final ProfissionalRepositoryPort profissionalRepository;
     private final AgendamentoRepositoryPort agendamentoRepository;
-    private final ValidacaoConflitoService validacaoConflitoService;
+    private final BloqueioRepositoryPort bloqueioRepository;
+    private final AgendaService agendaService;
 
     public CriarAgendamentoUseCase(UsuarioRepositoryPort usuarioRepository,
                                     ServicoRepositoryPort servicoRepository,
                                     ProfissionalRepositoryPort profissionalRepository,
                                     AgendamentoRepositoryPort agendamentoRepository,
-                                    ValidacaoConflitoService validacaoConflitoService) {
+                                    BloqueioRepositoryPort bloqueioRepository,
+                                    AgendaService agendaService) {
         this.usuarioRepository = usuarioRepository;
         this.servicoRepository = servicoRepository;
         this.profissionalRepository = profissionalRepository;
         this.agendamentoRepository = agendamentoRepository;
-        this.validacaoConflitoService = validacaoConflitoService;
+        this.bloqueioRepository = bloqueioRepository;
+        this.agendaService = agendaService;
     }
 
     @Transactional
@@ -48,18 +50,16 @@ public class CriarAgendamentoUseCase {
 
         var agendamento = Agendamento.calcularFim(usuarioId, servicoId, profissionalId, dataHoraInicio, servico);
 
-        var existentes = buscarAgendamentosConflitantes(profissionalId, dataHoraInicio, agendamento.getDataHoraFim());
+        var existentes = buscarAgendamentosConflitantesComLock(profissionalId, agendamento.getDataHoraInicio(), agendamento.getDataHoraFim());
 
-        if (validacaoConflitoService.temConflito(agendamento, existentes))
+        if (agendaService.temConflito(agendamento, existentes))
             throw new IllegalStateException("Conflito de horário: já existe um agendamento neste período");
 
         return agendamentoRepository.salvar(agendamento);
     }
 
-    private java.util.List<Agendamento> buscarAgendamentosConflitantes(Long profissionalId, LocalDateTime inicio, LocalDateTime fim) {
-        var inicioDia = inicio.toLocalDate().atStartOfDay();
-        var fimDia = inicio.toLocalDate().atTime(LocalTime.MAX);
-        return agendamentoRepository.buscarPorProfissionalEPeriodo(profissionalId, inicioDia, fimDia);
+    private List<Agendamento> buscarAgendamentosConflitantesComLock(Long profissionalId, LocalDateTime inicio, LocalDateTime fim) {
+        return agendamentoRepository.buscarPorProfissionalEPeriodoComLock(profissionalId, inicio, fim);
     }
 
 }

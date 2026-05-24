@@ -45,6 +45,12 @@ public class AgendamentoRepositoryImpl implements AgendamentoRepositoryPort {
     }
 
     @Override
+    public List<Agendamento> buscarPorProfissionalEPeriodoComLock(Long profissionalId, LocalDateTime inicio, LocalDateTime fim) {
+        return jpaRepository.findByProfissionalIdAndPeriodoComLock(profissionalId, inicio, fim)
+                .stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
     public List<Agendamento> buscarPorUsuarioId(Long usuarioId) {
         return jpaRepository.findByUsuarioId(usuarioId)
                 .stream().map(mapper::toDomain).toList();

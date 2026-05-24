@@ -11,5 +11,7 @@ public record AgendamentoResponse(
     Long profissionalId,
     String nomeProfissional,
     LocalDateTime dataHoraInicio,
-    LocalDateTime dataHoraFim
+    LocalDateTime dataHoraFim,
+    String status,
+    String motivoCancelamento
 ) {}

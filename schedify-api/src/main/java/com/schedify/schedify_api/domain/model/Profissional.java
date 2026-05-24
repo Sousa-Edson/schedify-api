@@ -8,6 +8,7 @@ public class Profissional {
 
     private Long id;
     private String nome;
+    private boolean ativo = true;
     private Set<Servico> servicos = new LinkedHashSet<>();
 
     public Profissional() {}
@@ -23,6 +24,7 @@ public class Profissional {
 
     public Long getId() { return id; }
     public String getNome() { return nome; }
+    public boolean isAtivo() { return ativo; }
     public Set<Servico> getServicos() { return Collections.unmodifiableSet(servicos); }
 
     public void setNome(String nome) {
@@ -32,6 +34,11 @@ public class Profissional {
             throw new IllegalArgumentException("Nome do profissional deve ter no máximo 150 caracteres");
         this.nome = nome.trim();
     }
+
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
+    public void ativar() { this.ativo = true; }
+    public void desativar() { this.ativo = false; }
 
     public boolean prestaServico(Servico servico) {
         return servicos.contains(servico);

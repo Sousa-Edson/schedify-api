@@ -9,6 +9,7 @@ public class Servico {
     private Long id;
     private String nome;
     private int duracaoMinutos;
+    private int bufferMinutos;
     private Set<Profissional> profissionais = new LinkedHashSet<>();
 
     public Servico() {}
@@ -16,17 +17,27 @@ public class Servico {
     public Servico(String nome, int duracaoMinutos) {
         setNome(nome);
         setDuracaoMinutos(duracaoMinutos);
+        this.bufferMinutos = 0;
     }
 
-    public Servico(Long id, String nome, int duracaoMinutos) {
+    public Servico(String nome, int duracaoMinutos, int bufferMinutos) {
+        setNome(nome);
+        setDuracaoMinutos(duracaoMinutos);
+        setBufferMinutos(bufferMinutos);
+    }
+
+    public Servico(Long id, String nome, int duracaoMinutos, int bufferMinutos) {
         this.id = id;
         setNome(nome);
         setDuracaoMinutos(duracaoMinutos);
+        setBufferMinutos(bufferMinutos);
     }
 
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public int getDuracaoMinutos() { return duracaoMinutos; }
+    public int getBufferMinutos() { return bufferMinutos; }
+    public int getTotalMinutos() { return duracaoMinutos + bufferMinutos; }
     public Set<Profissional> getProfissionais() { return Collections.unmodifiableSet(profissionais); }
 
     public void setNome(String nome) {
@@ -41,6 +52,12 @@ public class Servico {
         if (duracaoMinutos <= 0)
             throw new IllegalArgumentException("Duração deve ser maior que zero");
         this.duracaoMinutos = duracaoMinutos;
+    }
+
+    public void setBufferMinutos(int bufferMinutos) {
+        if (bufferMinutos < 0)
+            throw new IllegalArgumentException("Buffer não pode ser negativo");
+        this.bufferMinutos = bufferMinutos;
     }
 
     public void adicionarProfissional(Profissional profissional) {

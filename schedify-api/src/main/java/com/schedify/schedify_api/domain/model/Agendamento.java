@@ -10,6 +10,8 @@ public class Agendamento {
     private Long profissionalId;
     private LocalDateTime dataHoraInicio;
     private LocalDateTime dataHoraFim;
+    private StatusAgendamento status;
+    private String motivoCancelamento;
 
     public Agendamento() {}
 
@@ -20,6 +22,7 @@ public class Agendamento {
         this.profissionalId = profissionalId;
         setDataHoraInicio(dataHoraInicio);
         setDataHoraFim(dataHoraFim);
+        this.status = StatusAgendamento.AGENDADO;
     }
 
     public Agendamento(Long id, Long usuarioId, Long servicoId, Long profissionalId,
@@ -30,6 +33,7 @@ public class Agendamento {
         this.profissionalId = profissionalId;
         setDataHoraInicio(dataHoraInicio);
         setDataHoraFim(dataHoraFim);
+        this.status = StatusAgendamento.AGENDADO;
     }
 
     public Long getId() { return id; }
@@ -38,6 +42,8 @@ public class Agendamento {
     public Long getProfissionalId() { return profissionalId; }
     public LocalDateTime getDataHoraInicio() { return dataHoraInicio; }
     public LocalDateTime getDataHoraFim() { return dataHoraFim; }
+    public StatusAgendamento getStatus() { return status; }
+    public String getMotivoCancelamento() { return motivoCancelamento; }
 
     public void setDataHoraInicio(LocalDateTime dataHoraInicio) {
         if (dataHoraInicio == null)
@@ -47,12 +53,35 @@ public class Agendamento {
         this.dataHoraInicio = dataHoraInicio;
     }
 
+    public void setStatus(StatusAgendamento status) { this.status = status; }
+
     public void setDataHoraFim(LocalDateTime dataHoraFim) {
         if (dataHoraFim == null)
             throw new IllegalArgumentException("Data/hora de fim é obrigatória");
         if (dataHoraInicio != null && !dataHoraFim.isAfter(dataHoraInicio))
             throw new IllegalArgumentException("Data/hora de fim deve ser posterior à data/hora de início");
         this.dataHoraFim = dataHoraFim;
+    }
+
+    public void cancelar(String motivo) {
+        if (status == StatusAgendamento.FINALIZADO)
+            throw new IllegalStateException("Não é possível cancelar um agendamento já finalizado");
+        if (status == StatusAgendamento.CANCELADO)
+            throw new IllegalStateException("Agendamento já está cancelado");
+        this.status = StatusAgendamento.CANCELADO;
+        this.motivoCancelamento = motivo;
+    }
+
+    public void confirmar() {
+        if (status != StatusAgendamento.AGENDADO)
+            throw new IllegalStateException("Só é possível confirmar agendamentos pendentes");
+        this.status = StatusAgendamento.CONFIRMADO;
+    }
+
+    public void finalizar() {
+        if (status == StatusAgendamento.CANCELADO)
+            throw new IllegalStateException("Não é possível finalizar um agendamento cancelado");
+        this.status = StatusAgendamento.FINALIZADO;
     }
 
     public static Agendamento calcularFim(Long usuarioId, Long servicoId, Long profissionalId,
