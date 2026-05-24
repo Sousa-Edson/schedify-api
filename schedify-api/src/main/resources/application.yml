@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: schedify-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/schedify
+    username: schedify
+    password: schedify
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: America/Sao_Paulo
+
+  flyway:
+    enabled: false
+
+server:
+  timezone: America/Sao_Paulo
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    try-it-out-enabled: true
+    operations-sorter: method
+
+schedify:
+  slot:
+    intervalo-minutos: 15
+    horario-padrao-inicio: "09:00"
+    horario-padrao-fim: "18:00"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
