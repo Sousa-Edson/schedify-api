@@ -6,8 +6,10 @@ import com.schedify.schedify_api.infrastructure.persistence.mapper.ServicoEntity
 import com.schedify.schedify_api.infrastructure.persistence.repository.ServicoJpaRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional(readOnly = true)
 public class ServicoRepositoryImpl implements ServicoRepositoryPort {
 
     private final ServicoJpaRepository jpaRepository;
@@ -19,6 +21,7 @@ public class ServicoRepositoryImpl implements ServicoRepositoryPort {
     }
 
     @Override
+    @Transactional
     public Servico salvar(Servico servico) {
         var entity = mapper.toEntity(servico);
         var saved = jpaRepository.save(entity);

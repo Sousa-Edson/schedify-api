@@ -1,6 +1,5 @@
 package com.schedify.schedify_api.domain.model;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -25,7 +24,13 @@ public class Profissional {
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public boolean isAtivo() { return ativo; }
-    public Set<Servico> getServicos() { return Collections.unmodifiableSet(servicos); }
+    public Set<Servico> getServicos() { return servicos; }
+    public void setServicos(Set<Servico> servicos) {
+        this.servicos = new LinkedHashSet<>();
+        if (servicos != null) {
+            this.servicos.addAll(servicos);
+        }
+    }
 
     public void setNome(String nome) {
         if (nome == null || nome.trim().isBlank())
@@ -42,6 +47,14 @@ public class Profissional {
 
     public boolean prestaServico(Servico servico) {
         return servicos.contains(servico);
+    }
+
+    void adicionarServico(Servico servico) {
+        this.servicos.add(servico);
+    }
+
+    void removerServico(Servico servico) {
+        this.servicos.remove(servico);
     }
 
 }

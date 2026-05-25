@@ -1,6 +1,5 @@
 package com.schedify.schedify_api.domain.model;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class Servico {
     public int getDuracaoMinutos() { return duracaoMinutos; }
     public int getBufferMinutos() { return bufferMinutos; }
     public int getTotalMinutos() { return duracaoMinutos + bufferMinutos; }
-    public Set<Profissional> getProfissionais() { return Collections.unmodifiableSet(profissionais); }
+    public Set<Profissional> getProfissionais() { return profissionais; }
 
     public void setNome(String nome) {
         if (nome == null || nome.trim().isBlank())
@@ -64,12 +63,12 @@ public class Servico {
         if (profissional == null)
             throw new IllegalArgumentException("Profissional não pode ser nulo");
         this.profissionais.add(profissional);
-        profissional.getServicos().add(this);
+        profissional.adicionarServico(this);
     }
 
     public void removerProfissional(Profissional profissional) {
         this.profissionais.remove(profissional);
-        profissional.getServicos().remove(this);
+        profissional.removerServico(this);
     }
 
 }
