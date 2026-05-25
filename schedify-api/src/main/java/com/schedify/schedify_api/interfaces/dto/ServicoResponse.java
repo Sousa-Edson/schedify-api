@@ -6,5 +6,6 @@ public record ServicoResponse(
     Long id,
     String nome,
     int duracaoMinutos,
+    int bufferMinutos,
     Set<Long> profissionalIds
 ) {}

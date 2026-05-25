@@ -4,6 +4,7 @@ import com.schedify.schedify_api.domain.model.Servico;
 import com.schedify.schedify_api.domain.port.ServicoRepositoryPort;
 import com.schedify.schedify_api.infrastructure.persistence.mapper.ServicoEntityMapper;
 import com.schedify.schedify_api.infrastructure.persistence.repository.ServicoJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,11 @@ public class ServicoRepositoryImpl implements ServicoRepositoryPort {
     @Override
     public Optional<Servico> buscarPorId(Long id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Servico> buscarTodos() {
+        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
     }
 
 }

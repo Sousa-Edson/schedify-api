@@ -9,6 +9,7 @@ import com.schedify.schedify_api.domain.port.ServicoRepositoryPort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,15 @@ public class ServicoController {
         return ResponseEntity.ok(toResponse(servico));
     }
 
+    @GetMapping
+    @Operation(summary = "Listar todos os serviços")
+    public ResponseEntity<List<ServicoResponse>> listar() {
+        var servicos = servicoRepository.buscarTodos().stream()
+                .map(this::toResponse)
+                .toList();
+        return ResponseEntity.ok(servicos);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Buscar serviço por ID")
     public ResponseEntity<ServicoResponse> buscar(@PathVariable Long id) {
@@ -65,7 +75,7 @@ public class ServicoController {
         var profissionalIds = servico.getProfissionais().stream()
                 .map(com.schedify.schedify_api.domain.model.Profissional::getId)
                 .collect(Collectors.toSet());
-        return new ServicoResponse(servico.getId(), servico.getNome(), servico.getDuracaoMinutos(), profissionalIds);
+        return new ServicoResponse(servico.getId(), servico.getNome(), servico.getDuracaoMinutos(), servico.getBufferMinutos(), profissionalIds);
     }
 
 }
