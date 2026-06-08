@@ -1,5 +1,6 @@
 package com.schedify.schedify_api.domain.model;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -9,33 +10,39 @@ public class Servico {
     private String nome;
     private int duracaoMinutos;
     private int bufferMinutos;
+    private BigDecimal valor;
     private Set<Profissional> profissionais = new LinkedHashSet<>();
 
     public Servico() {}
 
-    public Servico(String nome, int duracaoMinutos) {
+    public Servico(String nome, int duracaoMinutos, BigDecimal valor) {
         setNome(nome);
         setDuracaoMinutos(duracaoMinutos);
+        setValor(valor);
         this.bufferMinutos = 0;
     }
 
-    public Servico(String nome, int duracaoMinutos, int bufferMinutos) {
+    public Servico(String nome, int duracaoMinutos, int bufferMinutos, BigDecimal valor) {
         setNome(nome);
         setDuracaoMinutos(duracaoMinutos);
         setBufferMinutos(bufferMinutos);
+        setValor(valor);
     }
 
-    public Servico(Long id, String nome, int duracaoMinutos, int bufferMinutos) {
+    public Servico(Long id, String nome, int duracaoMinutos, int bufferMinutos, BigDecimal valor) {
         this.id = id;
         setNome(nome);
         setDuracaoMinutos(duracaoMinutos);
         setBufferMinutos(bufferMinutos);
+        setValor(valor);
     }
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
     public int getDuracaoMinutos() { return duracaoMinutos; }
     public int getBufferMinutos() { return bufferMinutos; }
+    public BigDecimal getValor() { return valor; }
     public int getTotalMinutos() { return duracaoMinutos + bufferMinutos; }
     public Set<Profissional> getProfissionais() { return profissionais; }
 
@@ -57,6 +64,12 @@ public class Servico {
         if (bufferMinutos < 0)
             throw new IllegalArgumentException("Buffer não pode ser negativo");
         this.bufferMinutos = bufferMinutos;
+    }
+
+    public void setValor(BigDecimal valor) {
+        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0)
+            throw new IllegalArgumentException("Valor do serviço deve ser maior que zero");
+        this.valor = valor;
     }
 
     public void adicionarProfissional(Profissional profissional) {
